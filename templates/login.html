@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Expo{% endblock %}
+
+{% block content %}
+    <h1>Login</h1>
+    <!-- Login Form -->
+    <form id="login-form">
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+    <!-- Success/Error message -->
+    <div id="message" class="mt-3"></div>
+{% endblock %}
+     <!-- AJAX Script -->
+     {% block load_js %}
+       <!-- Bootstrap 5 JS -->
+     <script>
+        
+        
+        document.getElementById('login-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent form from submitting traditionally
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    username: email,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                // Store the JWT token in localStorage or cookies
+                localStorage.setItem('token', data.access_token);
+                // Redirect to a protected page or update UI
+                window.location.href = '/';  // Example redirect after successful login
+            } else {
+                // Display error message
+                const errorMessage = document.getElementById('message');
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = data.detail || 'Login failed. Please try again.';
+            }
+        });
+
+        // Logout function to remove email from localStorage and update UI
+    function logout() {
+        // Remove the email from localStorage
+        localStorage.removeItem('email');
+        
+        // Update the UI: Hide dashboard/logout links and show login/signup links
+        document.getElementById('login-link').style.display = 'block';
+        document.getElementById('signup-link').style.display = 'block';
+        document.getElementById('dashboard-link').style.display = 'none';
+        document.getElementById('logout-link').style.display = 'none';
+        
+        // Redirect to the homepage or login page
+        window.location.href = '/'; // Redirect to homepage (or use '/login' for login page)
+    }
+
+
+</script>
+    {% endblock %}
+
+
