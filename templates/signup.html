@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Signup - Expo{% endblock %}
+
+{% block content %}
+    <h1>Signup</h1>
+    <h2>Create an Account</h2>
+    <!-- Signup Form -->
+    <form id="signup-form">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email address</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
+        <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="full_name" name="full_name" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+
+    <!-- Success/Error message -->
+    <div id="message" class="mt-3"></div>
+{% endblock %}
+     <!-- AJAX Script -->
+     {% block load_js %}
+     <script>
+         $(document).ready(function() {
+             $("#signup-form").submit(function(e) {
+                 e.preventDefault();  // Prevent default form submission
+
+                 // Collect form data
+                 var formData = {
+                     username: $("#username").val(),
+                     email: $("#email").val(),
+                     full_name: $("#full_name").val(),
+                     password: $("#password").val()
+                    };
+                    
+                    console.log("Form Data:", formData);
+                    
+                    // Send data to FastAPI endpoint using AJAX
+                    $.ajax({
+                        url: "/signup",  // FastAPI signup endpoint
+                        type: "POST",
+                        contentType: "application/json",  // Send JSON data
+                        data: JSON.stringify(formData),  // Convert form data to JSON
+                        success: function(response) {
+                            $("#message").html('<div class="alert alert-success">User created successfully!</div>');
+                            // Optionally, redirect to login page or home page
+                            setTimeout(function() {
+                                window.location.href = "/login";  // Redirect to login page
+                            }, 2000);
+                        },
+                        error: function(xhr, status, error) {
+                            var errMessage = xhr.responseJSON.detail || "An error occurred!";
+                            $("#message").html('<div class="alert alert-danger">' + errMessage + '</div>');
+                        }
+                    });
+                });
+            });
+            </script>
+    {% endblock %}
+
+
