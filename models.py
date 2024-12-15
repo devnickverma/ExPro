@@ -23,5 +23,4 @@ class CourseInDB(BaseModel):
     id: int
     title: str
     description: str
-    created_at: str
     

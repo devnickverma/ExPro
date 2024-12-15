@@ -20,7 +20,7 @@
         try {
             const token = localStorage.getItem('token'); // Get the token from localStorage
             console.log("Token:", token);
-            const response = await fetch('/users/courses', {
+            const response = await fetch('/users/enroll_courses', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,26 +43,12 @@
             if (courses.length === 0) {
                 coursesListDiv.innerHTML = '<p>No enrolled courses found.</p>';
             } else {
+                console.log(courses)
                 const coursesHTML = courses.map(course => {
-                    // Check if course.sections exists and is an array
-                    let sectionsHTML = '';
-                    if (Array.isArray(course.sections) && course.sections.length > 0) {
-                        sectionsHTML = course.sections.map(section => {
-                            // Ensure section has both title and content
-                            return `
-                                <li><strong>${section.title || 'Untitled Section'}:</strong> ${section.content || 'No content available'}</li>
-                            `;
-                        }).join('');
-                    } else {
-                        sectionsHTML = '<p>No sections available for this course.</p>';
-                    }
-                    
                     return `
                         <div class="course mb-4 p-3 border">
                             <h4>${course.title}</h4>
                             <p> ${course.description}</p>
-                            
-                            <button class="btn btn-outline-danger " onclick="enrollInCourse(${course.id})">Enroll Now</button>
                         </div>
                     `;
                 }).join('');
@@ -76,38 +62,7 @@
         }
     }
 
-    // Function to handle enrollment
-    async function enrollInCourse(courseId) {
-        const token = localStorage.getItem('token'); // Get the token from localStorage
-        console.log("Token:", token);
-        if (!token) {
-            console.log('User is not logged in');
-            window.location.href = '/login'; // Redirect to login page if no token
-            return;
-        }
-
-        try {
-            const response = await fetch(`/enroll/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ course_id: courseId })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            alert(result.message); // Show success or error message from the API
-        } catch (error) {
-            console.error('Error enrolling in course:', error);
-            alert('Error enrolling in course. Please try again later.');
-        }
-    }
-
+    
     // Function to check login status on page load
     function checkLoginStatus() {
         const token = localStorage.getItem('token'); // Get the token from localStorage

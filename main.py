@@ -299,18 +299,21 @@ async def enroll_in_course(request: EnrollmentRequest, token: Annotated[str, Dep
         raise HTTPException(status_code=401, detail=f"JWT error: {str(e)}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-@app.post("/users/courses")
+@app.post("/users/enroll_courses", response_model=List[CourseInDB])
 async def get_enrolled_courses(token: str = Depends(oauth2_scheme)):
+    # Validate the token
     payload = validate_token(token)
-    email: str = payload.get("user_email")
+    email = payload.get("user_email")
+    
     if not email:
         raise HTTPException(status_code=401, detail="Invalid token")
     
+    # Get user by email
     user = get_user_by_email(email)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
+    # Connect to the database
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -322,15 +325,13 @@ async def get_enrolled_courses(token: str = Depends(oauth2_scheme)):
     """, (user[0],))
     
     courses = cursor.fetchall()
-    print(courses)
-    enrolled_courses = []
-    for course in courses:
-        course_id, title, description = course
-      
-        enrolled_courses.append(CourseInDB(id=course_id, title=title, description=description, created_at=datetime.utcnow()))
     
     conn.close()
-    return enrolled_courses
+
+    # Convert the fetched courses to the Pydantic model
+    courses_out = [CourseInDB(id=course[0], title=course[1], description=course[2]) for course in courses]
+    
+    return courses_out
 
 
 
