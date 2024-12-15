@@ -11,5 +11,8 @@ http://127.0.0.1:8000/view/courses
 
 
 
+python create_db.py
+
+python admin_create.py 
 
 
