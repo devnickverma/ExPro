@@ -180,6 +180,7 @@ async def create_course(course: Course):
     course_id = cursor.lastrowid
     
     # Insert sections for the course
+    print(course)
     for section in course.sections:
         cursor.execute("INSERT INTO sections (course_id, title, content, order_num) VALUES (?, ?, ?, ?)",
                        (course_id, section.title, section.content, section.order_num))
@@ -187,26 +188,15 @@ async def create_course(course: Course):
     conn.commit()
     conn.close()
     
-    return CourseInDB(id=course_id, title=course.title, description=course.description, created_at=datetime.utcnow())
+    return CourseInDB(id=course_id, title=course.title, description=course.description, created_at=str(datetime.utcnow()), sections=course.sections)
+
+
 from fastapi import HTTPException, Depends
 from typing import List
 from pydantic import BaseModel
  
 
-# Define Pydantic models for course and section (assuming they are defined somewhere)
-class SectionInDB(BaseModel):
-    id: int
-    course_id: int
-    title: str
-    content: str
-    order_num: int
 
-class CourseInDB(BaseModel):
-    id: int
-    title: str
-    description: str
-    created_at: str
-    sections: List[SectionInDB]
 
 # Define a function to validate the token
 def validate_token(token: str):
@@ -310,9 +300,9 @@ async def enroll_in_course(request: EnrollmentRequest, token: Annotated[str, Dep
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-@app.get("/users/courses")
+@app.post("/users/courses")
 async def get_enrolled_courses(token: str = Depends(oauth2_scheme)):
-    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    payload = validate_token(token)
     email: str = payload.get("user_email")
     if not email:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -332,56 +322,20 @@ async def get_enrolled_courses(token: str = Depends(oauth2_scheme)):
     """, (user[0],))
     
     courses = cursor.fetchall()
-    
+    print(courses)
     enrolled_courses = []
     for course in courses:
         course_id, title, description = course
-        # Get sections for each course
-        cursor.execute("SELECT * FROM sections WHERE course_id = ?", (course_id,))
-        sections = cursor.fetchall()
-        
-        sections_out = [SectionInDB(id=s[0], course_id=s[1], title=s[2], content=s[3], order_num=s[4]) for s in sections]
-        
-        enrolled_courses.append(CourseInDB(id=course_id, title=title, description=description, created_at=datetime.utcnow(), sections=sections_out))
+      
+        enrolled_courses.append(CourseInDB(id=course_id, title=title, description=description, created_at=datetime.utcnow()))
     
     conn.close()
     return enrolled_courses
 
 
 
-
-@app.route('/courses/create', methods=['GET', 'POST'])
-def create_course():
-    if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
-        sections = request.form.getlist('section_title')  # Getting sections
-        contents = request.form.getlist('section_content')
-        
-        # Create course and save sections in the database
-        create_new_course(title, description, sections, contents)
-        return redirect(url_for('courses'))
-    
-    return render_template('create_course.html')
-
-
-
-
-@app.route('/courses/create', methods=['GET', 'POST'])
-def create_course():
-    if request.method == 'POST':
-        title = request.form['title']
-        description = request.form['description']
-        sections = request.form.getlist('section_title')  # Getting sections
-        contents = request.form.getlist('section_content')
-        
-        # Create course and save sections in the database
-        create_new_course(title, description, sections, contents)
-        return redirect(url_for('courses'))
-    
-    return render_template('create_course.html')
-
-
+ 
+ 
 
 def get_course_by_id(course_id):
     # Example using SQLite
@@ -415,3 +369,7 @@ async def courese_deatils(request: Request):
 @app.get("/view/courses/create", response_class=HTMLResponse)
 async def courses_create(request: Request):
     return templates.TemplateResponse("create_course.html", {"request": request})
+
+@app.get("/view/mycourses", response_class=HTMLResponse)
+async def my_courses(request: Request):
+    return templates.TemplateResponse("mycourses.html", {"request": request})

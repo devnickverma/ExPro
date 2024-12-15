@@ -10,13 +10,7 @@ class Section(BaseModel):
 class Course(BaseModel):
     title: str
     description: str
-    sections: List[Section]  # Nested sections within a course
-
-class CourseInDB(BaseModel):
-    id: int
-    title: str
-    description: str
-    created_at: datetime
+    sections: List[Section]   
 
 class SectionInDB(BaseModel):
     id: int
@@ -24,3 +18,10 @@ class SectionInDB(BaseModel):
     title: str
     content: str
     order_num: int
+ 
+class CourseInDB(BaseModel):
+    id: int
+    title: str
+    description: str
+    created_at: str
+    

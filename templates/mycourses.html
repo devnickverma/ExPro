@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Courses - My Website{% endblock %}
+{% block title %}My Courses - My Website{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
-        <h1>Available Courses</h1>
+        <h1>Enrolled Courses</h1>
         
         <!-- Container to display courses -->
         <div id="courses-list">
@@ -20,7 +20,7 @@
         try {
             const token = localStorage.getItem('token'); // Get the token from localStorage
             console.log("Token:", token);
-            const response = await fetch('/api/listcourses/', {
+            const response = await fetch('/users/courses', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +41,7 @@
             coursesListDiv.innerHTML = ''; // Clear the loading message
 
             if (courses.length === 0) {
-                coursesListDiv.innerHTML = '<p>No courses available for enrollment.</p>';
+                coursesListDiv.innerHTML = '<p>No enrolled courses found.</p>';
             } else {
                 const coursesHTML = courses.map(course => {
                     // Check if course.sections exists and is an array

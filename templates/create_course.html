@@ -89,6 +89,7 @@
 
         // Send the data to the API using fetch
         try {
+            console.log(course);
             const response = await fetch('/api/courses/', {
                 method: 'POST',
                 headers: {
