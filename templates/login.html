@@ -59,21 +59,7 @@
             }
         });
 
-        // Logout function to remove email from localStorage and update UI
-    function logout() {
-        // Remove the email from localStorage
-        localStorage.removeItem('email');
-        
-        // Update the UI: Hide dashboard/logout links and show login/signup links
-        document.getElementById('login-link').style.display = 'block';
-        document.getElementById('signup-link').style.display = 'block';
-        document.getElementById('dashboard-link').style.display = 'none';
-        document.getElementById('logout-link').style.display = 'none';
-        
-        // Redirect to the homepage or login page
-        window.location.href = '/'; // Redirect to homepage (or use '/login' for login page)
-    }
-
+   
 
 </script>
     {% endblock %}

@@ -66,6 +66,66 @@ def get_password_hash(password: str):
 
 
 
+def validate_token_refresh(token: str):
+    try:
+        # Decode the JWT token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token does not contain a valid user ID"
+            )
+        
+        # Here, you can validate the user against your database if necessary
+        # For example, by checking if the user exists in the 'users' table:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
+
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+
+        return payload  # Return the decoded token information, including user_id
+
+    except jwt.PyJWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+
+# API endpoint to check user validity
+@app.get("/api/check_user")
+async def check_user(request: Request):
+    # Get token from the Authorization header
+    token = request.headers.get('Authorization')
+    print(token)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is missing"
+        )
+
+    # Remove "Bearer " prefix from the token string
+    token = token.split(" ")[1] if token.startswith("Bearer ") else token
+
+    # Validate token and check user
+    try:
+        print(token)
+        user = validate_token(token)
+        print("User: ", user)
+        return {"status": "valid", "user_id": user["user_id"]}  # Return user ID and valid status
+    except HTTPException as e:
+        # Return error if the token is invalid
+        return {"status": "invalid", "detail": str(e.detail)}
+
+
 def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
