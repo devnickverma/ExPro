@@ -47,8 +47,11 @@
                 const coursesHTML = courses.map(course => {
                     return `
                         <div class="course mb-4 p-3 border">
-                            <h4>${course.title}</h4>
+                            <h4><a href="/view/courses/details/${ course.id }" style="text-decoration: none; color: #007bff;">${course.title}</a></h4>
                             <p> ${course.description}</p>
+
+                            
+
                         </div>
                     `;
                 }).join('');

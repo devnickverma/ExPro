@@ -1,19 +1,130 @@
 {% extends "base.html" %}
 
-{% block title %}Course Details - My Website{% endblock %}
+{% block title %}My Courses - My Website{% endblock %}
 
 {% block content %}
-    <h1>{{ course.title }}</h1>
-    <p>{{ course.description }}</p>
+<div class="container mt-5">
+    <header>
+        <h1>{{ course.title }}</h1>
+        <p><strong>Description:</strong> {{ course.description }}</p>
+    </header>
 
-    <h3>Course Sections</h3>
-    <ul>
-        {% for section in course.sections %}
-            <li>
-                <strong>{{ section.title }}</strong>: {{ section.content }}
-            </li>
-        {% endfor %}
-    </ul>
+    <section>
+        <h2>Sections</h2>
+        {% if course.sections %}
+            <ul>
+                {% for section in course.sections %}
+                    <li>
+                        <h3>{{ section.title }}</h3>
+                        <p>{{ section.content }}</p>
+                        <!-- Mark as Completed Button -->
+                        <button class="btn btn-success" id="section-{{ section.id }}" onclick="markAsCompleted('{{ section.id }}')">Mark as Completed</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No sections available for this course.</p>
+        {% endif %}
+    </section>
 
-    <a href="{{ url_for('enroll_in_course', course_id=course.id) }}">Enroll in this course</a>
+    <a href="/view/mycourses" class="btn btn-warning">Back to Courses List</a>
+</div>
+{% endblock %}
+
+{% block load_js %}
+<script>
+    // Function to update button visibility based on completion status
+async function updateCompletionButtons() {
+    const userId = localStorage.getItem('token'); // Replace with logic to fetch the logged-in user's ID
+
+    if (!userId) {
+        alert("User not logged in");
+        window.location.href = "/login";
+        return;
+    }
+
+    try {
+        // Fetch the completion status from the API
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+            console.log("Token:", token);
+        const response = await fetch(`/api/completed_sections/`, 
+        {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+
+        const completedSections = await response.json();
+
+        // Iterate over all buttons and hide the completed ones
+        document.querySelectorAll("[id^='section-']").forEach(button => {
+            const sectionId = button.getAttribute("id").split("-")[1]; // Extract section ID from button ID
+            if (completedSections[sectionId]) {
+                button.remove(); // Remove the button if the section is completed
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching completed sections:", error);
+        alert("An error occurred while updating the section completion status.");
+    }
+}
+
+
+
+    // Function to mark the section as completed
+    async function markAsCompleted(sectionId) {
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+        console.log("Token:", token);
+
+        if (!token) {
+            alert('Please log in to mark the section as completed.');
+            window.location.href = '/login'; // Redirect to login page if no token
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/mark_section_completed/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ section_id: sectionId })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+     
+            alert('Section marked as completed!');
+            window.location.reload(true);
+        } catch (error) {
+            console.error('Error marking section as completed:', error);
+            alert('Error marking section as completed. Please try again later.');
+        }
+    }
+
+    // Check login status on page load
+    function checkLoginStatus() {
+        const token = localStorage.getItem('token'); // Get the token from localStorage
+
+        if (!token) {
+            console.log('User is not logged in');
+            // Redirect to the login page if no token is found
+            window.location.href = '/login'; // Change the URL if your login page is at a different path
+        } else {
+            console.log('User is logged in');
+        }
+    }
+
+    window.onload = function() {
+        checkLoginStatus(); // Check the login status
+        updateCompletionButtons();
+    };
+</script>
 {% endblock %}

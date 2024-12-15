@@ -374,3 +374,108 @@ async def courses_create(request: Request):
 @app.get("/view/mycourses", response_class=HTMLResponse)
 async def my_courses(request: Request):
     return templates.TemplateResponse("mycourses.html", {"request": request})
+
+@app.get("/view/coursedetails", response_class=HTMLResponse)
+async def course_details(request: Request):
+    return templates.TemplateResponse("course_details.html", {"request": request})
+
+@app.get("/view/courses/details/{course_id}", response_class=HTMLResponse)
+async def course_details(request: Request, course_id: int):
+    # Fetch course details from the database by course_id
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Fetch course data
+    cursor.execute("SELECT * FROM courses WHERE id = ?", (course_id,))
+    course = cursor.fetchone()
+    
+    # Fetch course sections
+    cursor.execute("SELECT * FROM sections WHERE course_id = ?", (course_id,))
+    sections = cursor.fetchall()
+    
+    conn.close()
+    
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    # Construct course details response
+    course_details = {
+        "course_id": course[0],
+        "title": course[1],
+        "description": course[2],
+        "sections": [{"id": section[0], "title": section[2], "content": section[3]} for section in sections]
+    }
+    
+    # Pass the course details to the frontend template
+    return templates.TemplateResponse("courses_details.html", {"request": request, "course": course_details})
+
+ 
+from pydantic import BaseModel
+
+class MarkSectionCompletedRequest(BaseModel):
+    section_id: int
+
+
+@app.post("/api/mark_section_completed/")
+async def mark_section_completed(
+    request: MarkSectionCompletedRequest,
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
+    # Validate the token
+    payload = validate_token(token)
+    email = payload.get("user_email", "")
+    if not email:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    # Get the user from the database
+    user = get_user_by_email(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Check if the section is already marked as completed
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM completed_sections WHERE user_id = ? AND section_id = ?",
+        (user[0], request.section_id),
+    )
+    completed = cursor.fetchone()
+
+    if completed:
+        raise HTTPException(
+            status_code=400,
+            detail="Section already marked as completed"
+        )
+
+    # Mark the section as completed
+    cursor.execute(
+        "INSERT INTO completed_sections (user_id, section_id) VALUES (?, ?)",
+        (user[0], request.section_id),
+    )
+    conn.commit()
+    conn.close()
+
+    return {"message": "Section marked as completed successfully"}
+
+
+@app.post("/api/completed_sections/")
+async def get_completed_sections(   
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
+    user = validate_token(token)
+    user_id = user["user_id"]
+
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT section_id 
+        FROM completed_sections 
+        WHERE user_id = ?
+    ''', (user_id,))
+    completed_sections = cursor.fetchall()
+    conn.close()
+    print(completed_sections)
+    # Prepare a dictionary of completed section IDs
+    completed_dict = {row[0]: True for row in completed_sections}
+    return completed_dict
