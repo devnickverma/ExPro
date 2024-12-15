@@ -6,8 +6,8 @@
     <div class="container mt-5">
         <h1>Available Courses</h1>
         <div>
-
-            <a class=""  id="create-course-link" href="/view/courses/create">Create Courses</a>
+            <a class="text-primary"  id="create-course-link" href="/view/courses/create">Create Courses</a>
+            <a class="text-danger"  id="go-live-link" href="/view/courses/create">Go Live</a>
         </div>
         
         <!-- Container to display courses -->
@@ -168,9 +168,11 @@
                 if (result.status === 'valid') {
                     console.log('User is valid:', result);
                     document.getElementById('create-course-link').style.display = 'block';
+                    document.getElementById('go-live-link').style.display = 'block';
                 } else {
                     console.log('User is not valid:', result.detail);
                     document.getElementById('create-course-link').style.display = 'none';
+                    document.getElementById('go-live-link').style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error checking user validity:', error);

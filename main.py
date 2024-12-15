@@ -294,6 +294,7 @@ def validate_token(token: str):
         print(token)
         # Decode the JWT token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("This is the payload: ", payload)
         return payload
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
@@ -601,19 +602,77 @@ logging.basicConfig(level=logging.DEBUG)
 
 @app.get("/view/courses/create", response_class=HTMLResponse)
 async def courses_create(request: Request):
-    # if not token:
-    #     raise HTTPException(status_code=401, detail="Not authenticated111")
-    
-    # logging.debug(f"Token received: {token}")
-    
-    # try:
-    #     payload = validate_token(token)
-    #     user_id = get_user_by_email(payload["user_email"])
-    # except Exception as e:
-    #     raise HTTPException(status_code=401, detail="Invalid token or user")
-    
-    # if is_admin(user_id):
-    #     return templates.TemplateResponse("create_course.html", {"request": request})
-
-    # return templates.TemplateResponse("login.html", {"request": request})
+ 
     return templates.TemplateResponse("create_course.html", {"request": request})
+
+
+
+def get_user_progress_2(user_id):
+    """Get the user's progress in each course."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Get all courses the user is enrolled in
+    cursor.execute('''
+        SELECT c.id, c.title
+        FROM courses c
+        JOIN enrollments e ON c.id = e.course_id
+        WHERE e.user_id = ?
+    ''', (user_id,))
+    courses = cursor.fetchall()
+
+    progress = []
+
+    # For each course, calculate the completion progress
+    for course in courses:
+        course_id, course_title = course
+
+        # Get total number of sections in the course
+        cursor.execute('''
+            SELECT COUNT(*) FROM sections WHERE course_id = ?
+        ''', (course_id,))
+        total_sections = cursor.fetchone()[0]
+
+        # Get the number of completed sections by the user
+        cursor.execute('''
+            SELECT COUNT(*) FROM completed_sections 
+            WHERE user_id = ? AND section_id IN (SELECT id FROM sections WHERE course_id = ?)
+        ''', (user_id, course_id))
+        completed_sections = cursor.fetchone()[0]
+
+        # Calculate the progress percentage
+        progress_percentage = (completed_sections / total_sections) * 100 if total_sections > 0 else 0
+
+        progress.append({
+            'course_title': course_title,
+            'progress_percentage': progress_percentage
+        })
+
+
+    print(progress)
+    conn.close()
+    return progress
+
+
+@app.get("/view/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request):
+  
+    return templates.TemplateResponse("dashboard.html", {"request": request})
+
+from fastapi.responses import JSONResponse
+@app.post("/api/progress/")
+async def get_user_progress(   
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
+    user = validate_token(token)
+    email = user["user_email"]
+    user = get_user_by_email(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    print("This is the user: ", user)
+    progress = get_user_progress_2(user[0])
+    print(progress)
+    print("This is the progress: ", progress)
+    return JSONResponse(content={"progress": progress})
+
+    # return get_user_progress(user[0])

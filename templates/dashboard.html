@@ -1,1 +1,139 @@
-Heelloworld
+{% extends "base.html" %}
+
+{% block title %}Courses - My Website{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Welcome to Your Course Dashboard!</h1>
+
+    <!-- Progress Dashboard -->
+    <div class="mt-5">
+        <h3>Your Progress</h3>
+        <div id="progress-container" class="mt-5">Loading progress...</div>   
+    </div>
+
+ 
+</div>
+{% endblock %}
+
+{% block load_js %}
+<script>
+    // Function to simulate course progress
+    async function fetchProgress() {
+        try {
+            const token = localStorage.getItem('token'); // Get the token from localStorage
+            console.log("Token:", token);
+
+            const response = await fetch('/api/progress/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                }
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                const progress = data.progress;   
+                console.log(progress)
+                updateProgress(progress);
+            } else {
+                console.log('Error fetching progress:', data);
+                document.getElementById('progress-text').textContent = 'Error loading progress!';
+            }
+        } catch (error) {
+            console.log('Error:', error);
+            document.getElementById('progress-text').textContent = 'Error loading progress!';
+        }
+    }
+
+    function updateProgress(progressData) {
+    const progressContainer = document.getElementById('progress-container');  // Assuming you have a container to hold the progress bars
+    progressContainer.innerHTML = '';  // Clear previous progress bars
+
+    // Loop through each course's progress data and create a progress bar for each
+    progressData.forEach(courseProgress => {
+        const { course_title, progress_percentage } = courseProgress;
+        console.log( course_title, progress_percentage)
+        // Create a new progress bar for the course
+        const progressWrapper = document.createElement('div');
+        progressWrapper.classList.add('course-progress', 'mb-4');  // Add spacing between progress bars
+
+        // Create course title element
+        const courseTitle = document.createElement('h5');
+        courseTitle.textContent = course_title;
+        progressWrapper.appendChild(courseTitle);
+
+        // Create progress bar using Bootstrap 5 classes
+        const progressBarWrapper = document.createElement('div');
+        progressBarWrapper.classList.add('progress');
+
+        const progressBarInner = document.createElement('div');
+        progressBarInner.classList.add('progress-bar');
+        progressBarInner.setAttribute('role', 'progressbar');
+        progressBarInner.style.width = `${progress_percentage}%`;
+        progressBarInner.setAttribute('aria-valuenow', progress_percentage);
+        progressBarInner.setAttribute('aria-valuemin', 0);
+        progressBarInner.setAttribute('aria-valuemax', 100);
+        progressBarInner.textContent = `${progress_percentage}%`;
+
+        // Append the progress bar to the wrapper
+        progressBarWrapper.appendChild(progressBarInner);
+        progressWrapper.appendChild(progressBarWrapper);
+
+        // Create a progress text
+        const progressText = document.createElement('p');
+        progressText.textContent = `Progress: ${progress_percentage}%`;
+
+        // Update text when course is completed
+        if (progress_percentage === 100) {
+            progressText.textContent = `${course_title} Completed!`;
+        }
+
+        progressWrapper.appendChild(progressText);
+
+        // Append the progress bar to the container
+        progressContainer.appendChild(progressWrapper);
+    });
+}
+   
+    async function check_user_login() {
+        const token = localStorage.getItem('token');  // Retrieve the token from localStorage or cookies
+        if (token) {
+            try {
+                const response = await fetch('/api/check_user', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,  // Send the token in the Authorization header
+                    },
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'valid') {
+                    console.log('User is valid:', result);
+                    // Proceed with loading user data or displaying user-specific content
+                    fetchProgress();  // Fetch progress data after verifying user
+                    
+                } else {
+                    console.log('User is not valid:', result.detail);
+                    // Redirect to login page or show an error
+                    window.location.href = '/login';  // Example redirect to login page
+                }
+            } catch (error) {
+                console.error('Error checking user validity:', error);
+            }
+        } else {
+            console.log('No token found, redirecting to login...');
+            window.location.href = '/login';  // Redirect to login page if no token is found
+        }
+    }
+
+    // Call check_user_login and fetch user-related data on page load
+    window.onload = function() {
+        check_user_login();
+    };
+</script>
+{% endblock %}
