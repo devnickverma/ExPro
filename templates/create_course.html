@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Create Course - My Website{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Create a New Course</h1>
+    
+    <form id="course-form">
+        <!-- Course Title -->
+        <div class="mb-3">
+            <label for="title" class="form-label">Course Title:</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+
+        <!-- Course Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Course Description:</label>
+            <textarea class="form-control" id="description" name="description" required></textarea>
+        </div>
+
+        <!-- Sections -->
+        <h3>Sections</h3>
+        <div id="sections">
+            <div class="section mb-3">
+                <label for="section_title" class="form-label">Section Title:</label>
+                <input type="text" class="form-control" name="section_title[]">
+            </div>
+
+            <div class="section mb-3">
+                <label for="section_content" class="form-label">Section Content:</label>
+                <textarea class="form-control" name="section_content[]"></textarea>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-secondary mb-3" onclick="addSection()">Add Another Section</button><br>
+        <button type="button" class="btn btn-primary" onclick="submitCourse()">Create Course</button>
+    </form>
+</div>
+{% endblock %}
+
+
+{% block load_js %}
+<script>
+    // Function to add a new section
+    function addSection() {
+        const section = document.createElement('div');
+        section.classList.add('section', 'mb-3');
+        section.innerHTML = `
+            <div class="mb-3">
+                <label for="section_title" class="form-label">Section Title:</label>
+                <input type="text" class="form-control" name="section_title[]">
+            </div>
+            <div class="mb-3">
+                <label for="section_content" class="form-label">Section Content:</label>
+                <textarea class="form-control" name="section_content[]"></textarea>
+            </div>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSection(this)">Delete Section</button>
+        `;
+        document.getElementById('sections').appendChild(section);
+    }
+
+    // Function to delete a section
+    function deleteSection(button) {
+        const section = button.parentElement;
+        section.remove();
+    }
+
+    // Function to submit the course data using fetch
+    async function submitCourse() {
+        const course = {
+            title: document.getElementById('title').value,
+            description: document.getElementById('description').value,
+            sections: []
+        };
+
+        // Collect all sections
+        const sectionTitles = document.getElementsByName('section_title[]');
+        const sectionContents = document.getElementsByName('section_content[]');
+
+        for (let i = 0; i < sectionTitles.length; i++) {
+            const section = {
+                title: sectionTitles[i].value,
+                content: sectionContents[i].value,
+                order_num: i + 1
+            };
+            course.sections.push(section);
+        }
+
+        // Send the data to the API using fetch
+        try {
+            const response = await fetch('/api/courses/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(course),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            console.log('Course created successfully:', result);
+            alert('Course created successfully!');
+            // Optionally, clear the form after successful creation
+            document.getElementById('course-form').reset();
+        } catch (error) {
+            console.error('Error creating course:', error);
+            alert('Error creating course!');
+        }
+    }
+</script>
+
+{% endblock %}

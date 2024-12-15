@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Course Details - My Website{% endblock %}
+
+{% block content %}
+    <h1>{{ course.title }}</h1>
+    <p>{{ course.description }}</p>
+
+    <h3>Course Sections</h3>
+    <ul>
+        {% for section in course.sections %}
+            <li>
+                <strong>{{ section.title }}</strong>: {{ section.content }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('enroll_in_course', course_id=course.id) }}">Enroll in this course</a>
+{% endblock %}

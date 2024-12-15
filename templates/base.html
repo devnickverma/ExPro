@@ -24,18 +24,27 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
+
+                    <!--When user not logged in -->
                     <li class="nav-item">
                         <a class="nav-link text-white px-3" id="login-link" href="/login">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white px-3"  id="dashboard-link" href="#">Dashboard</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-white px-3" id="signup-link" href="/signup">Signup</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link text-white px-3" id="courses-link" href="/view/courses">Courses</a>
+                    </li>
+
+                     <!--When user logged in -->
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-3"  id="dashboard-link" href="#">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white px-3"  id="my-courses-link" href="#">My Courses</a>
+                    </li>
+                    <li class="nav-item">
                            <a class="nav-link text-white px-3" id="logout-link" href="javascript:void(0)" onclick="logout()">Logout</a>
-                        
                     </li>
                 </ul>
             </div>
@@ -48,14 +57,20 @@
             console.log(email);
             if (email) {
                 // If logged in, hide login/signup links and show dashboard/logout links
-                document.getElementById('login-link').style.display = 'none';
                 document.getElementById('signup-link').style.display = 'none';
+                document.getElementById('login-link').style.display = 'none';
+
+                document.getElementById('courses-link').style.display = 'block';
                 document.getElementById('dashboard-link').style.display = 'block';
                 document.getElementById('logout-link').style.display = 'block';
+                document.getElementById('my-courses-link').style.display = 'block';
             } else {
                 // If not logged in, show login/signup links and hide dashboard/logout links
                 document.getElementById('login-link').style.display = 'block';
                 document.getElementById('signup-link').style.display = 'block';
+                document.getElementById('courses-link').style.display = 'block';
+                document.getElementById('my-courses-link').style.display = 'none';
+
                 document.getElementById('dashboard-link').style.display = 'none';
                 document.getElementById('logout-link').style.display = 'none';
             }
