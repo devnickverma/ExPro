@@ -66,6 +66,7 @@ async function updateCompletionButtons() {
                 button.remove(); // Remove the button if the section is completed
             }
         });
+        
     } catch (error) {
         console.error("Error fetching completed sections:", error);
         alert("An error occurred while updating the section completion status.");

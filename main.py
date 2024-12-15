@@ -41,7 +41,7 @@ async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
 
 # Database helper functions
 def get_db_connection():
-    conn = sqlite3.connect('users.db')
+    conn = sqlite3.connect('expro_database.db')
     return conn
 
 def get_user_by_email(email: str):

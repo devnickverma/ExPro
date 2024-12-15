@@ -102,6 +102,7 @@
 
             const result = await response.json();
             alert(result.message); // Show success or error message from the API
+            window.location.reload(true);
         } catch (error) {
             console.error('Error enrolling in course:', error);
             alert('Error enrolling in course. Please try again later.');

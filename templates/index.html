@@ -3,6 +3,40 @@
 {% block title %}Home - My Website{% endblock %}
 
 {% block content %}
-    <h1>Welcome to My Website</h1>
-    <p>This is the home page. Use the navigation bar to login or sign up.</p>
+<header class="bg-primary text-white text-center py-5">
+    <h1>Welcome to ExPro</h1>
+    <p>Your e-learning platform. Use the navigation bar to log in or sign up and start learning today!</p>
+</header>
+
+<section class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Explore Courses</h5>
+                    <p class="card-text">Access a variety of courses to enhance your skills and knowledge.</p>
+                    <a href="/view/courses" class="btn btn-primary">Learn More</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Sign Up</h5>
+                    <p class="card-text">Create an account to access personalized content and features.</p>
+                    <a href="/signup" class="btn btn-success">Sign Up Now</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Log In</h5>
+                    <p class="card-text">Already have an account? Log in to continue learning.</p>
+                    <a href="/login" class="btn btn-secondary">Log In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}
