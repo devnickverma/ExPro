@@ -15,7 +15,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
         full_name TEXT,
-        hashed_password TEXT NOT NULL
+        hashed_password TEXT NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE
     );
     ''')
 

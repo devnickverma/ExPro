@@ -24,9 +24,9 @@ templates = Jinja2Templates(directory="templates")
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 300
+    
 
-
-
+ 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -124,6 +124,36 @@ async def check_user(request: Request):
     except HTTPException as e:
         # Return error if the token is invalid
         return {"status": "invalid", "detail": str(e.detail)}
+
+
+# API endpoint to check user validity
+@app.get("/api/check_admin")
+async def check_admin(request: Request):
+    # Get token from the Authorization header
+    token = request.headers.get('Authorization')
+    print(token)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is missing"
+        )
+
+    # Remove "Bearer " prefix from the token string
+    token = token.split(" ")[1] if token.startswith("Bearer ") else token
+
+    # Validate token and check user
+    try:
+        print(token)
+        user = validate_token(token)
+        print("User: ", user)
+        new_user = get_user_by_email(user["user_email"])
+        print(new_user)
+        if new_user[4]:
+            return {"status": "valid", "user_id": user["user_id"], "is_admin":  new_user[4]}  # Return user ID and valid status
+        return {"status": "invalid"}  
+    except HTTPException as e:
+        # Return error if the token is invalid
+        return {"status": "invalid", "detail": str(e)}
 
 
 def verify_password(plain_password: str, hashed_password: str):
@@ -261,6 +291,7 @@ from pydantic import BaseModel
 # Define a function to validate the token
 def validate_token(token: str):
     try:
+        print(token)
         # Decode the JWT token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
@@ -427,9 +458,28 @@ async def courses(request: Request):
 async def courese_deatils(request: Request):
     return templates.TemplateResponse("courses_details.html", {"request": request})
 
-@app.get("/view/courses/create", response_class=HTMLResponse)
-async def courses_create(request: Request):
-    return templates.TemplateResponse("create_course.html", {"request": request})
+
+ 
+ 
+# # Function to check if the user is an admin
+
+
+ 
+# from fastapi import HTTPException
+
+# @app.get("/view/courses/create", response_class=HTMLResponse)
+# async def courses_create(request: Request, token: Annotated[str, Depends(oauth2_scheme)]):
+#     try:
+#         payload = validate_token(token)
+#         user_id = get_user_by_email(payload["user_email"])
+#     except Exception as e:
+#         raise HTTPException(status_code=401, detail="Invalid token or user")
+
+#     if is_admin(user_id):
+#         return templates.TemplateResponse("create_course.html", {"request": request})
+
+#     return templates.TemplateResponse("login.html", {"request": request})
+
 
 @app.get("/view/mycourses", response_class=HTMLResponse)
 async def my_courses(request: Request):
@@ -539,3 +589,31 @@ async def get_completed_sections(
     # Prepare a dictionary of completed section IDs
     completed_dict = {row[0]: True for row in completed_sections}
     return completed_dict
+
+
+
+
+from fastapi import HTTPException
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+
+@app.get("/view/courses/create", response_class=HTMLResponse)
+async def courses_create(request: Request):
+    # if not token:
+    #     raise HTTPException(status_code=401, detail="Not authenticated111")
+    
+    # logging.debug(f"Token received: {token}")
+    
+    # try:
+    #     payload = validate_token(token)
+    #     user_id = get_user_by_email(payload["user_email"])
+    # except Exception as e:
+    #     raise HTTPException(status_code=401, detail="Invalid token or user")
+    
+    # if is_admin(user_id):
+    #     return templates.TemplateResponse("create_course.html", {"request": request})
+
+    # return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("create_course.html", {"request": request})

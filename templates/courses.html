@@ -5,6 +5,10 @@
 {% block content %}
     <div class="container mt-5">
         <h1>Available Courses</h1>
+        <div>
+
+            <a class=""  id="create-course-link" href="/view/courses/create">Create Courses</a>
+        </div>
         
         <!-- Container to display courses -->
         <div id="courses-list">
@@ -145,9 +149,42 @@
         window.location.href = '/login';  // Redirect to login page if no token is found
     }
         }
+
+
+        async function check_user_login(){
+            const token = localStorage.getItem('token');  // Retrieve the token from localStorage or cookies
+            if (token) {
+                try {
+                    const response = await fetch('/api/check_admin', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,  // Send the token in the Authorization header
+                    },
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'valid') {
+                    console.log('User is valid:', result);
+                    document.getElementById('create-course-link').style.display = 'block';
+                } else {
+                    console.log('User is not valid:', result.detail);
+                    document.getElementById('create-course-link').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error checking user validity:', error);
+                // Handle errors (e.g., network issues)
+            }
+        } else {
+            console.log('No token found, redirecting to login...');
+            window.location.href = '/login';  // Redirect to login page if no token is found
+        }
+        }
+
     // Combine both functions into one window.onload handler
     window.onload = function() {
-        
+        check_user_login()
         fetchCourses();     // Then fetch the courses
     };
 </script>

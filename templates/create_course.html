@@ -117,7 +117,7 @@
             const token = localStorage.getItem('token');  // Retrieve the token from localStorage or cookies
          if (token) {
         try {
-            const response = await fetch('/api/check_user', {
+            const response = await fetch('/api/check_admin', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

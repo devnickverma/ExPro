@@ -24,7 +24,8 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
-
+                  
+                 
                     <!--When user not logged in -->
                     <li class="nav-item">
                         <a class="nav-link text-white px-3" id="login-link" href="/login">Login</a>
@@ -43,49 +44,18 @@
                     <li class="nav-item">
                         <a class="nav-link text-white px-3"  id="my-courses-link" href="/view/mycourses">My Courses</a>
                     </li>
+                  
                     <li class="nav-item">
-                           <a class="nav-link text-white px-3" id="logout-link" href="javascript:void(0)" onclick="logout()">Logout</a>
-                    </li>
+                        <a class="nav-link px-3 text-danger" id="logout-link" href="javascript:void(0)" onclick="logout()">Logout</a>
+                 </li>
+                   
                 </ul>
             </div>
         </div>
     </nav>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if the email exists in localStorage to determine login status
-            const email = localStorage.getItem('token');
-            console.log(email);
-            if (email) {
-                // If logged in, hide login/signup links and show dashboard/logout links
-                document.getElementById('signup-link').style.display = 'none';
-                document.getElementById('login-link').style.display = 'none';
 
-                document.getElementById('courses-link').style.display = 'block';
-                document.getElementById('dashboard-link').style.display = 'block';
-                document.getElementById('logout-link').style.display = 'block';
-                document.getElementById('my-courses-link').style.display = 'block';
-            } else {
-                // If not logged in, show login/signup links and hide dashboard/logout links
-                document.getElementById('login-link').style.display = 'block';
-                document.getElementById('signup-link').style.display = 'block';
-                document.getElementById('courses-link').style.display = 'block';
-                document.getElementById('my-courses-link').style.display = 'none';
-
-                document.getElementById('dashboard-link').style.display = 'none';
-                document.getElementById('logout-link').style.display = 'none';
-            }
-        });
-    
-        // Logout function to remove email from localStorage
-        function logout() {
-            localStorage.removeItem('token');
-            location.reload(); // Reload the page to update the UI
-        }
-
-        
-       
- 
-    </script>
+   
+   
 
     <!-- Content Block -->
     <div class="container mt-5">
@@ -97,6 +67,47 @@
   
      
     {% block load_js %}{% endblock %}
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+           
+            // Check if the email exists in localStorage to determine login status
+            const email = localStorage.getItem('token');
+            console.log(email);
+            if (email) {
+                // If logged in, hide login/signup links and show dashboard/logout links
+                document.getElementById('signup-link').style.display = 'none';
+                document.getElementById('login-link').style.display = 'none';
+
+                document.getElementById('courses-link').style.display = 'block';
+                document.getElementById('dashboard-link').style.display = 'block';
+                document.getElementById('logout-link').style.display = 'block';
+                document.getElementById('my-courses-link').style.display = 'block'; 
+            } else {
+                // If not logged in, show login/signup links and hide dashboard/logout links
+                document.getElementById('login-link').style.display = 'block';
+                document.getElementById('signup-link').style.display = 'block';
+                document.getElementById('courses-link').style.display = 'block';
+                document.getElementById('my-courses-link').style.display = 'none';
+               
+
+                document.getElementById('dashboard-link').style.display = 'none';
+                document.getElementById('logout-link').style.display = 'none';
+            }
+           
+        });
     
+        // Logout function to remove email from localStorage
+        function logout() {
+            localStorage.removeItem('token');
+            location.reload(); // Reload the page to update the UI
+        }
+
+
+        
+         
+   
+ 
+    </script>
 </body>
 </html>
