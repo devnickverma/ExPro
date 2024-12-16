@@ -1,39 +1,85 @@
 {% extends "base.html" %}
 
-{% block title %}Home - My Website{% endblock %}
+{% block title %}Home - ExPro{% endblock %}
 
 {% block content %}
-<header class="bg-primary text-white text-center py-5">
-    <h1>Welcome to ExPro</h1>
-    <p>Your e-learning platform. Use the navigation bar to log in or sign up and start learning today!</p>
-</header>
+<!-- Hero Section -->
+<section class="hero bg-light py-5">
+    <div class="container text-center">
+        <div class="row align-items-center">
+            <div class="col-md-6 text-start">
+                <h1 class="fw-bold display-5">Education is easy for everyone</h1>
+                <p class="text-muted">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ven...</p>
+                <a href="/view/courses" class="btn btn-warning text-dark fw-bold px-4 py-2">Explore courses</a>
+            </div>
+            <div class="col-md-6">
+                <img src="https://cdn.elearningindustry.com/wp-content/uploads/2022/02/shutterstock_1112381495.jpg" alt="E-learning" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
 
-<section class="container my-5">
-    <div class="row text-center">
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Explore Courses</h5>
-                    <p class="card-text">Access a variety of courses to enhance your skills and knowledge.</p>
-                    <a href="/view/courses" class="btn btn-primary">Learn More</a>
+<!-- Partner Logos -->
+<section class="partners py-4">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-2"><img src="https://cdn6.f-cdn.com/contestentries/1162950/18299824/59ef996d1981d_thumb900.jpg" alt="M-ta" class="img-fluid"></div>
+            <div class="col-2"><img src="https://wordpress.peppercontent.io/wp-content/uploads/2021/10/21-Free-Content-Writing-Courses-to-Kickstart-Your-Freelance-Career.jpg" alt="Stanford" class="img-fluid"></div>
+            <div class="col-2"><img src="https://img-c.udemycdn.com/course/480x270/1768454_dc00_4.jpg" alt="Illinois" class="img-fluid"></div>
+            <div class="col-2"><img src="https://cdn5.f-cdn.com/contestentries/1122631/26158298/59a97e224cfb7_thumb900.jpg" alt="Duke" class="img-fluid"></div>
+        </div>
+        <a href="#" class="text-decoration-none text-primary">Learn from more than 160 member universities</a>
+    </div>
+</section>
+
+<!-- Featured Courses -->
+<section class="featured-courses bg-light py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Featured Courses</h2>
+            <a href="#" class="btn btn-warning text-dark">All</a>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="https://foundr.com/wp-content/uploads/2021/09/Best-online-course-platforms.png" class="card-img-top" alt="Course 1">
+                    <div class="card-body">
+                        <p class="fw-bold">18k Enrolled</p>
+                        <h5 class="card-title fw-bold">Lorem ipsum dolor sit amet</h5>
+                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Stanford</span>
+                            <div class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Sign Up</h5>
-                    <p class="card-text">Create an account to access personalized content and features.</p>
-                    <a href="/signup" class="btn btn-success">Sign Up Now</a>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="https://akm-img-a-in.tosshub.com/businesstoday/images/story/202210/online-education-3412473_1920_1200x675-sixteen_nine.jpg?size=1000:563" class="card-img-top" alt="Course 2">
+                    <div class="card-body">
+                        <p class="fw-bold">2500 Enrolled</p>
+                        <h5 class="card-title fw-bold">Lorem ipsum dolor sit amet</h5>
+                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Illinois</span>
+                            <div class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title">Log In</h5>
-                    <p class="card-text">Already have an account? Log in to continue learning.</p>
-                    <a href="/login" class="btn btn-secondary">Log In</a>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <img src="https://blogassets.leverageedu.com/blog/wp-content/uploads/2019/11/23173156/Distance-Learning-MBA.jpg" class="card-img-top" alt="Course 3">
+                    <div class="card-body">
+                        <p class="fw-bold">230k Enrolled</p>
+                        <h5 class="card-title fw-bold">Lorem ipsum dolor sit amet</h5>
+                        <p class="text-muted">Lorem ipsum dolor sit amet, consectetur...</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Penn</span>
+                            <div class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
